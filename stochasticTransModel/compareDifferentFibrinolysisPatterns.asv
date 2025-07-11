@@ -1,0 +1,135 @@
+% =======================================================================
+% =======================================================================
+% COMPARING RESULTS, SHRINK MODEL HYBRID V CONTINUOUS
+% =======================================================================
+% =======================================================================
+clear
+clc
+
+% Folder has to be in the same directory as this file
+%addpath('\\icnas4.cc.ic.ac.uk\ap4409\MATLAB\stochKinPaperSims\stochasticKineticsShrink');
+%addpath('\\icnas4.cc.ic.ac.uk\ap4409\MATLAB\stochKinPaperSims\continuousKinetics');
+
+% =======================================================================
+% INPUTS
+% =======================================================================
+global U_0 check N_old extentLysis
+global k_a k_r k_2 k_cat K_M epsilon_0 n_0 LtVt N_CS N_AV N_0
+global k_a k_r store
+global N_CS epsilon_0 N_species
+global check
+global k_a k_r k_2 k_cat K_M epsilon_0 n_0 LtVt N_CS N_AV N_0 N_old
+
+R_f0 = 100;
+rho_0 = 3;
+U_0 = 100;
+finalTime = 10*60;
+nt = 1000;
+Cs_tPA = 0.04; Cs_PLG = 2.2; Cs_PLS = 0;
+lysisLevel = 0.5;
+N_fibres = 1;
+
+%matlabpool open 4
+
+U_array = [180];
+
+for it = 1:length(U_array)
+    
+    R_f0 = U_array(it);
+
+% Running stochasic approach 
+% All variables located in ploti class
+fprintf('Running Hybrid model... \n')
+tic()
+[t,ploti] = funHybridTransModel(R_f0,rho_0,U_0,finalTime,nt,[Cs_tPA, Cs_PLG, Cs_PLS],N_fibres,lysisLevel);
+toc()
+
+% Running continuous method
+fprintf('Running Continuous model... \n')
+tic()
+[timespan,plotCon] = funHybridShrinkModel(R_f0,rho_0,U_0,finalTime,nt,[Cs_tPA, Cs_PLG, Cs_PLS],N_fibres);
+toc()
+
+%save(strcat(num2str(U_0),'_comparison'));
+
+plot(t,ploti.extentLysis,'-k',timespan,plotCon.extentLysis,'-r')
+hold on
+
+end
+
+%matlabpool close
+% 
+% 
+% ======================================================================
+% Plotting variables of interest
+% ======================================================================
+% Red colour represents results from continuous model
+% Black colour represents results from hybrid model
+% Straight line refers to the free phase
+% % Dotted line refers to the bound phase
+% 
+% figHandle = figure(1);
+% width = 12.5;
+% height = 14;
+% set(figHandle, 'units','centimeters','pos',[0 0 width height])
+% 
+% % ========================================================================
+% % VOIDAGE (MEASURE OF LYSIS)
+% % ========================================================================
+% 
+% subplot(2,2,1)
+% plot(timespan,plotCon.epsilon,'-r',t,ploti.epsilon,'-k');
+% xlabel('Time (s)');
+% ylabel('Voidage');
+% title('A')
+% 
+% % ========================================================================
+% % tPA COMPARISONS
+% % ========================================================================
+% 
+% subplot(2,2,2)
+% plot(timespan,plotCon.CtPA,'-r',t,ploti.CtPA,'-k',timespan,plotCon.ntPA,'--r',t,ploti.ntPA,'--k')
+% xlabel('Time (s)');
+% ylabel('Concentration (\muM)');
+% title('B')
+% 
+% % ========================================================================
+% % PLG COMPARISONS
+% % ========================================================================
+% 
+% subplot(2,2,3)
+% plot(timespan,plotCon.CPLG/50,'-r',t,ploti.CPLG/50,'-k',timespan,plotCon.nPLG,'--r',t,ploti.nPLG,'--k')
+% xlabel('Time (s)');
+% ylabel('Concentration (\muM)');
+% title('C')
+% 
+% % ========================================================================
+% % PLS COMPARISONS
+% % ========================================================================
+% 
+% subplot(2,2,4)
+% plot(timespan,plotCon.CPLS,'-r',t,ploti.CPLS,'-k',timespan,plotCon.nPLS,'--r',t,ploti.nPLS,'--k')
+% xlabel('Time (s)');
+% ylabel('Concentration (\muM)');
+% title('D')
+% 
+% % ========================================================================
+% % n_tot COMPARISONS
+% % ========================================================================
+% figure(2)
+% plot(timespan,plotCon.ntot,'-r',t,ploti.ntot,'-k')
+% xlabel('Time (s)');
+% ylabel('Concentration (\muM)');
+% title('D')
+
+% 
+% % ========================================================================
+% % SAVING FIGURE 
+% % ========================================================================
+% 
+% % saveas(figHandle,'compareShrinkHybridCon.fig');
+% 
+
+
+
+

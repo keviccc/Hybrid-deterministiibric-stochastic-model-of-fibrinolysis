@@ -317,7 +317,6 @@ Parameters should therefore be checked carefully before using the code for a new
 
 No license has currently been specified for this repository.
 
-If the code is intended for public reuse, an appropriate open-source license should be added.
 
 ## Contact
 
